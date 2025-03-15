@@ -1,11 +1,38 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from 'react';
+import TaskList from '@/components/TaskList';
+import { cn } from '@/lib/utils';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <div 
+        className={cn(
+          "max-w-4xl mx-auto px-6 py-10 min-h-screen",
+          "animate-fade-in"
+        )}
+      >
+        <header className="mb-10 text-center">
+          <div className="inline-block mb-4">
+            <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider uppercase bg-primary/10 text-primary rounded-full mb-2">
+              Planning
+            </span>
+          </div>
+          <h1 className="text-4xl font-bold tracking-tight mb-2">Your Daily Tasks</h1>
+          <p className="text-lg text-muted-foreground">
+            Plan your day, track your progress, and stay organized.
+          </p>
+        </header>
+        
+        <main>
+          <div className="bg-white/60 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+            <TaskList />
+          </div>
+        </main>
+        
+        <footer className="mt-12 text-center text-sm text-muted-foreground">
+          <p>All your tasks are saved locally in your browser.</p>
+        </footer>
       </div>
     </div>
   );

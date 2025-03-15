@@ -1,19 +1,20 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 0 0% 98%;
+    --foreground: 222 14% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 14% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 14% 18%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 210 100% 50%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -35,19 +36,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -96,6 +90,84 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Custom selection */
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+  }
+}
+
+/* Heading styles */
+@layer components {
+  .heading-1 {
+    @apply text-4xl font-semibold tracking-tight;
+  }
+  
+  .heading-2 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+  
+  .heading-3 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+  
+  .heading-4 {
+    @apply text-xl font-semibold tracking-tight;
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+
+  /* Task item transitions */
+  .task-enter {
+    @apply animate-slide-up;
+  }
+  
+  .task-exit {
+    @apply animate-fade-out;
+  }
+
+  /* Checkbox custom styles */
+  .checkbox-container {
+    @apply relative flex items-center;
+  }
+
+  .checkbox-container input[type="checkbox"] {
+    @apply h-5 w-5 rounded-md border border-gray-300 
+    text-primary shadow-sm focus:border-primary 
+    focus:ring focus:ring-primary focus:ring-opacity-20 
+    focus:ring-offset-0 transition-all duration-200;
+  }
+
+  .checkbox-container input[type="checkbox"]:checked {
+    @apply bg-primary border-primary;
+  }
+
+  .checkbox-container input[type="checkbox"]:checked + span {
+    @apply line-through text-muted-foreground transition-all duration-200;
   }
 }
