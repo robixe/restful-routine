@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Task, ScheduleItem } from '@/types/Task';
-import { loadTasks, saveTasks, loadWeeklySchedule } from '@/lib/storage';
+import { Task, ScheduleItem, User } from '@/types/Task';
+import { loadTasks, saveTasks, loadWeeklySchedule, loadUser, saveUser } from '@/lib/storage';
 import { toast } from '@/hooks/use-toast';
 import TaskItem from './TaskItem';
 import TaskInput from './TaskInput';
@@ -11,27 +11,62 @@ import WeeklySchedule from './WeeklySchedule';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Calendar } from 'lucide-react';
+import { Calendar, LogOut } from 'lucide-react';
+import LoginForm from './LoginForm';
 
 const TaskList: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeTab, setActiveTab] = useState<"tasks" | "schedule">("tasks");
+  const [user, setUser] = useState<User | null>(null);
 
-  // Load tasks from localStorage on component mount
+  // Load user from localStorage on component mount
   useEffect(() => {
-    setTasks(loadTasks());
+    setUser(loadUser());
   }, []);
 
-  // Save tasks to localStorage whenever they change
+  // Load tasks from localStorage on component mount and only if user is logged in
   useEffect(() => {
-    saveTasks(tasks);
-  }, [tasks]);
+    if (user?.isLoggedIn) {
+      setTasks(loadTasks());
+    }
+  }, [user?.isLoggedIn]);
+
+  // Save tasks to localStorage whenever they change and user is logged in
+  useEffect(() => {
+    if (user?.isLoggedIn) {
+      saveTasks(tasks);
+    }
+  }, [tasks, user?.isLoggedIn]);
+
+  // Handle successful login
+  const handleLogin = (username: string) => {
+    const newUser = { username, isLoggedIn: true };
+    setUser(newUser);
+    saveUser(newUser);
+    
+    toast({
+      title: "Login successful",
+      description: `Welcome, ${username}!`,
+    });
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    setUser({ username: '', isLoggedIn: false });
+    saveUser({ username: '', isLoggedIn: false });
+    
+    toast({
+      title: "Logout successful",
+      description: "You have been logged out.",
+    });
+  };
 
   // Add a new task
   const handleAddTask = useCallback((title: string) => {
     const newTask: Task = {
       id: Date.now().toString(),
       title,
+      description: '',
       completed: false,
       createdAt: new Date().toISOString(),
     };
@@ -63,6 +98,20 @@ const TaskList: React.FC = () => {
     });
   }, []);
 
+  // Update task description
+  const handleUpdateDescription = useCallback((id: string, description: string) => {
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === id ? { ...task, description } : task
+      )
+    );
+    
+    toast({
+      title: "Description updated",
+      description: "The task description has been updated.",
+    });
+  }, []);
+
   // Get today's day name
   const getTodayDayName = (): ScheduleItem["day"] => {
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -80,6 +129,7 @@ const TaskList: React.FC = () => {
     const scheduleTasks = todayItems.map(item => ({
       id: `schedule-${item.id}-${Date.now()}`,
       title: `${item.timeSlot} - ${item.activity}`,
+      description: item.description,
       completed: item.completed,
       createdAt: new Date().toISOString(),
     }));
@@ -106,8 +156,25 @@ const TaskList: React.FC = () => {
   // Load weekly schedule
   const weeklySchedule = loadWeeklySchedule();
 
+  // If not logged in, show login form
+  if (!user?.isLoggedIn) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-8">
+        <LoginForm onLogin={handleLogin} />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-4">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-medium">Welcome, {user.username}</h2>
+        <Button variant="outline" size="sm" onClick={handleLogout}>
+          <LogOut className="h-4 w-4 mr-2" />
+          Logout
+        </Button>
+      </div>
+      
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "tasks" | "schedule")}>
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="tasks">Daily Tasks</TabsTrigger>
@@ -146,6 +213,7 @@ const TaskList: React.FC = () => {
                     task={task}
                     onToggle={handleToggleTask}
                     onDelete={handleDeleteTask}
+                    onUpdateDescription={handleUpdateDescription}
                   />
                 ))}
               </div>

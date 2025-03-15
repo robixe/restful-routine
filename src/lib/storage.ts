@@ -1,8 +1,8 @@
-
-import { Task, WeeklySchedule, ScheduleItem } from "@/types/Task";
+import { Task, WeeklySchedule, ScheduleItem, User } from "@/types/Task";
 
 const TASKS_STORAGE_KEY = 'planning-tasks';
 const SCHEDULE_STORAGE_KEY = 'weekly-schedule';
+const USER_STORAGE_KEY = 'planning-user';
 
 export const loadTasks = (): Task[] => {
   try {
@@ -43,6 +43,28 @@ export const saveWeeklySchedule = (schedule: WeeklySchedule): void => {
     localStorage.setItem(SCHEDULE_STORAGE_KEY, JSON.stringify(schedule));
   } catch (error) {
     console.error('Failed to save weekly schedule to localStorage:', error);
+  }
+};
+
+export const loadUser = (): User => {
+  try {
+    const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+    if (storedUser) {
+      return JSON.parse(storedUser);
+    }
+  } catch (error) {
+    console.error('Failed to load user from localStorage:', error);
+  }
+  
+  // Return default user (not logged in)
+  return { username: '', isLoggedIn: false };
+};
+
+export const saveUser = (user: User): void => {
+  try {
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+  } catch (error) {
+    console.error('Failed to save user to localStorage:', error);
   }
 };
 
