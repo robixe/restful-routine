@@ -55,35 +55,40 @@ const getDefaultWeeklySchedule = (): WeeklySchedule => {
         day: day as ScheduleItem["day"],
         timeSlot: "08:00 - 12:00",
         activity: "Focused Work on PFE & School Studies",
-        description: "Prioritize S6 courses, assignments, and PFE tasks. Alternate between theory (studying) and practical work (coding, research)."
+        description: "Prioritize S6 courses, assignments, and PFE tasks. Alternate between theory (studying) and practical work (coding, research).",
+        completed: false
       },
       {
         id: `${day.toLowerCase()}-lunch`,
         day: day as ScheduleItem["day"],
         timeSlot: "12:00 - 13:00",
         activity: "Lunch & Break",
-        description: "Take time to eat and rest."
+        description: "Take time to eat and rest.",
+        completed: false
       },
       {
         id: `${day.toLowerCase()}-afternoon-1`,
         day: day as ScheduleItem["day"],
         timeSlot: "13:00 - 15:00",
         activity: "Training / Extra Learning",
-        description: "If you have sports, do it and leave at 15:00. If no sports, use this time for 1337 projects, training, or reviewing concepts."
+        description: "If you have sports, do it and leave at 15:00. If no sports, use this time for 1337 projects, training, or reviewing concepts.",
+        completed: false
       },
       {
         id: `${day.toLowerCase()}-afternoon-2`,
         day: day as ScheduleItem["day"],
         timeSlot: "15:00 - 17:00",
         activity: "1337 Work & Personal Projects",
-        description: "Only if no sports. Work on the Philosophers project, Fract-ol, or other coding tasks. Continue with your platform development."
+        description: "Only if no sports. Work on the Philosophers project, Fract-ol, or other coding tasks. Continue with your platform development.",
+        completed: false
       },
       {
         id: `${day.toLowerCase()}-evening`,
         day: day as ScheduleItem["day"],
         timeSlot: "Evening",
         activity: "Rest, Sport & Social Time",
-        description: "Rest & Light Study (2 hours max): Revise, read, or do light coding. Sport/Relaxation if not done earlier. Balance with friends, family, or hobbies."
+        description: "Rest & Light Study (2 hours max): Revise, read, or do light coding. Sport/Relaxation if not done earlier. Balance with friends, family, or hobbies.",
+        completed: false
       }
     ]),
     
@@ -93,21 +98,24 @@ const getDefaultWeeklySchedule = (): WeeklySchedule => {
       day: "Saturday",
       timeSlot: "Morning",
       activity: "Deep Work & Catch-Up",
-      description: "Review school work & PFE (focus on planning)."
+      description: "Review school work & PFE (focus on planning).",
+      completed: false
     },
     {
       id: "saturday-afternoon",
       day: "Saturday",
       timeSlot: "Afternoon",
       activity: "Personal projects",
-      description: "Focus on coding, platform, training."
+      description: "Focus on coding, platform, training.",
+      completed: false
     },
     {
       id: "saturday-evening",
       day: "Saturday",
       timeSlot: "Evening",
       activity: "Relaxation",
-      description: "Relaxation, light review if needed."
+      description: "Relaxation, light review if needed.",
+      completed: false
     },
     
     // Sunday
@@ -116,7 +124,8 @@ const getDefaultWeeklySchedule = (): WeeklySchedule => {
       day: "Sunday",
       timeSlot: "All day",
       activity: "Rest & Recharge",
-      description: "Full rest day, or minimal study if necessary. Spend time on hobbies, family, and self-care."
+      description: "Full rest day, or minimal study if necessary. Spend time on hobbies, family, and self-care.",
+      completed: false
     }
   ];
   

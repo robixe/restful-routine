@@ -12,6 +12,7 @@ export interface ScheduleItem {
   timeSlot: string;
   activity: string;
   description: string;
+  completed: boolean;
 }
 
 export interface WeeklySchedule {

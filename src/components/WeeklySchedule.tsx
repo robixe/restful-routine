@@ -14,8 +14,11 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from '@/hooks/use-toast';
+import { saveWeeklySchedule } from '@/lib/storage';
 
 interface WeeklyScheduleProps {
   scheduleItems: ScheduleItem[];
@@ -24,6 +27,27 @@ interface WeeklyScheduleProps {
 const DAYS_OF_WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ scheduleItems }) => {
+  const [items, setItems] = React.useState<ScheduleItem[]>(scheduleItems);
+
+  // Handle item completion toggle
+  const handleToggleComplete = (id: string) => {
+    const updatedItems = items.map(item => 
+      item.id === id ? { ...item, completed: !item.completed } : item
+    );
+    
+    setItems(updatedItems);
+    
+    // Save updated items to local storage
+    saveWeeklySchedule({ items: updatedItems });
+    
+    // Show toast notification
+    const item = updatedItems.find(i => i.id === id);
+    toast({
+      title: item?.completed ? "Activity marked as complete" : "Activity marked as incomplete",
+      description: item?.activity,
+    });
+  };
+
   return (
     <div className="my-8 animate-fade-in">
       <div className="mb-6">
@@ -47,13 +71,14 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ scheduleItems }) => {
         {DAYS_OF_WEEK.map(day => (
           <TabsContent key={day} value={day} className="mt-0">
             <div className="space-y-4">
-              {scheduleItems
+              {items
                 .filter(item => item.day === day)
                 .map(item => (
                   <Card 
                     key={item.id} 
                     className={cn(
-                      "overflow-hidden border-l-4",
+                      "overflow-hidden border-l-4 transition-colors",
+                      item.completed ? "bg-muted/30" : "",
                       day === "Saturday" || day === "Sunday" 
                         ? "border-l-secondary" 
                         : "border-l-primary"
@@ -61,13 +86,31 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ scheduleItems }) => {
                   >
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-center">
-                        <CardTitle className="text-lg">{item.activity}</CardTitle>
+                        <div className="flex items-center gap-2">
+                          <Checkbox 
+                            id={`check-${item.id}`}
+                            checked={item.completed}
+                            onCheckedChange={() => handleToggleComplete(item.id)}
+                          />
+                          <CardTitle className={cn(
+                            "text-lg transition-all",
+                            item.completed && "line-through text-muted-foreground"
+                          )}>
+                            {item.activity}
+                          </CardTitle>
+                          {item.completed && (
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          )}
+                        </div>
                         <div className="flex items-center text-sm text-muted-foreground">
                           <Clock className="h-4 w-4 mr-1" />
                           <span>{item.timeSlot}</span>
                         </div>
                       </div>
-                      <CardDescription className="mt-1">
+                      <CardDescription className={cn(
+                        "mt-1",
+                        item.completed && "text-muted-foreground/60"
+                      )}>
                         {item.description}
                       </CardDescription>
                     </CardHeader>
