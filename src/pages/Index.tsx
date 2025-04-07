@@ -15,7 +15,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       <div 
         className={cn(
-          "max-w-4xl mx-auto px-6 py-10 min-h-screen",
+          "w-full max-w-6xl mx-auto px-4 sm:px-6 py-10 min-h-screen",
           "animate-fade-in"
         )}
       >
@@ -31,10 +31,10 @@ const Index = () => {
           </p>
         </header>
         
-        <main>
+        <main className="w-full">
           {isLoggedIn && <PomodoroSection tasks={tasks} />}
           
-          <div className="bg-white/60 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-white/60 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden w-full">
             <TaskList />
           </div>
         </main>

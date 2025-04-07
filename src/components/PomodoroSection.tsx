@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import PomodoroTimer from './PomodoroTimer';
 import { Task } from '@/types/Task';
-import { Clock, CheckCircle } from 'lucide-react';
+import { Clock, CheckCircle, ArrowRight, Target, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface PomodoroSectionProps {
   tasks?: Task[];
@@ -16,16 +17,17 @@ const PomodoroSection: React.FC<PomodoroSectionProps> = ({ tasks = [] }) => {
   const filteredTasks = tasks.filter(task => !task.completed);
 
   return (
-    <div className="bg-white/60 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden p-6 mb-8">
-      <div className="flex items-center justify-between mb-4">
+    <div className="w-full bg-white/60 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden p-6 mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Clock className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-semibold">Pomodoro Timer</h2>
         </div>
 
         <Sheet>
-          <SheetTrigger className="px-4 py-2 text-sm bg-primary/10 text-primary rounded-full hover:bg-primary/20">
-            Full View
+          <SheetTrigger className="px-4 py-2 text-sm bg-primary/10 text-primary rounded-full hover:bg-primary/20 flex items-center gap-2">
+            <Menu className="h-4 w-4" />
+            <span>Full View</span>
           </SheetTrigger>
           <SheetContent side="right" className="w-full sm:max-w-md p-0">
             <div className="p-6">
@@ -33,7 +35,10 @@ const PomodoroSection: React.FC<PomodoroSectionProps> = ({ tasks = [] }) => {
               
               {filteredTasks.length > 0 && (
                 <div className="mt-8">
-                  <h3 className="text-sm font-medium mb-2">Focus on a task:</h3>
+                  <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
+                    <Target className="h-4 w-4 text-primary" />
+                    Focus on a task:
+                  </h3>
                   <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
                     {filteredTasks.map(task => (
                       <button
@@ -72,79 +77,56 @@ const PomodoroSection: React.FC<PomodoroSectionProps> = ({ tasks = [] }) => {
         </Sheet>
       </div>
 
-      <PomodoroTimer currentTask={selectedTask} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="flex-1">
+          <PomodoroTimer currentTask={selectedTask} />
+        </div>
 
-      {filteredTasks.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-sm font-medium mb-2">Select a task to focus on:</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[150px] overflow-y-auto pr-2">
-            {filteredTasks.slice(0, 4).map(task => (
-              <button
-                key={task.id}
-                onClick={() => setSelectedTask(task)}
-                className={cn(
-                  "p-2 rounded-lg border text-sm transition-all",
-                  selectedTask?.id === task.id
-                    ? "bg-primary/10 border-primary/30"
-                    : "bg-white hover:bg-gray-50"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <CheckCircle className={cn(
-                    "h-4 w-4",
-                    selectedTask?.id === task.id ? "text-primary" : "text-muted-foreground/30" 
-                  )} />
-                  <span className="truncate">{task.title}</span>
-                </div>
-              </button>
-            ))}
-            {filteredTasks.length > 4 && (
-              <Sheet>
-                <SheetTrigger className="p-2 rounded-lg border text-sm transition-all bg-gray-50 hover:bg-gray-100">
-                  +{filteredTasks.length - 4} more tasks
-                </SheetTrigger>
-                <SheetContent side="bottom">
-                  <h3 className="text-lg font-medium mb-4">Select a task to focus on</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {filteredTasks.map(task => (
-                      <button
-                        key={task.id}
-                        onClick={() => {
-                          setSelectedTask(task);
-                          document.querySelector('[data-state="open"]')?.dispatchEvent(
-                            new KeyboardEvent('keydown', { key: 'Escape' })
-                          );
-                        }}
-                        className={cn(
-                          "p-3 rounded-lg border text-sm transition-all text-left",
-                          selectedTask?.id === task.id
-                            ? "bg-primary/10 border-primary/30"
-                            : "bg-white hover:bg-gray-50"
-                        )}
-                      >
-                        <div className="flex items-start">
+        {filteredTasks.length > 0 && (
+          <div className="flex-1">
+            <Card className="border border-primary/10 bg-white/80">
+              <CardContent className="p-4">
+                <h3 className="text-sm font-medium mb-4 flex items-center gap-2 text-primary">
+                  <Target className="h-4 w-4" />
+                  Select a task to focus on
+                </h3>
+                <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-2">
+                  {filteredTasks.map(task => (
+                    <button
+                      key={task.id}
+                      onClick={() => setSelectedTask(task)}
+                      className={cn(
+                        "p-3 rounded-lg border text-sm transition-all text-left",
+                        selectedTask?.id === task.id
+                          ? "bg-primary/10 border-primary/30"
+                          : "bg-white hover:bg-gray-50"
+                      )}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
                           <CheckCircle className={cn(
-                            "h-4 w-4 mt-0.5",
+                            "h-4 w-4",
                             selectedTask?.id === task.id ? "text-primary" : "text-muted-foreground/30" 
                           )} />
-                          <div className="ml-2">
-                            <p className="font-medium">{task.title}</p>
-                            {task.description && (
-                              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                                {task.description}
-                              </p>
-                            )}
-                          </div>
+                          <span className="font-medium">{task.title}</span>
                         </div>
-                      </button>
-                    ))}
-                  </div>
-                </SheetContent>
-              </Sheet>
-            )}
+                        {selectedTask?.id === task.id && (
+                          <ArrowRight className="h-4 w-4 text-primary animate-pulse" />
+                        )}
+                      </div>
+                      {task.description && (
+                        <p className="text-xs text-muted-foreground mt-1 ml-6 line-clamp-1">
+                          {task.description}
+                        </p>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
