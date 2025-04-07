@@ -25,6 +25,18 @@ export const saveTasks = (tasks: Task[]): void => {
   }
 };
 
+export const updateTaskTags = (taskId: string, tags: string[]): void => {
+  try {
+    const tasks = loadTasks();
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, tags } : task
+    );
+    saveTasks(updatedTasks);
+  } catch (error) {
+    console.error('Failed to update task tags:', error);
+  }
+};
+
 export const loadWeeklySchedule = (): WeeklySchedule => {
   try {
     const storedSchedule = localStorage.getItem(SCHEDULE_STORAGE_KEY);
@@ -67,6 +79,11 @@ export const saveUser = (user: User): void => {
   } catch (error) {
     console.error('Failed to save user to localStorage:', error);
   }
+};
+
+export const verifyLogin = (username: string, password: string): boolean => {
+  // Hard-coded credentials check for admin/admin
+  return username === 'admin' && password === 'admin';
 };
 
 export const updateLunchTime = (newTimeSlot: string): void => {

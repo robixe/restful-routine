@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Task, ScheduleItem, User } from '@/types/Task';
-import { loadTasks, saveTasks, loadWeeklySchedule, loadUser, saveUser } from '@/lib/storage';
+import { loadTasks, saveTasks, loadWeeklySchedule, loadUser, saveUser, updateTaskTags } from '@/lib/storage';
 import { toast } from '@/hooks/use-toast';
 import TaskItem from './TaskItem';
 import TaskInput from './TaskInput';
@@ -10,7 +11,7 @@ import WeeklySchedule from './WeeklySchedule';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Calendar, LogOut, Clock } from 'lucide-react';
+import { Calendar, LogOut, Clock, Tag } from 'lucide-react';
 import LoginForm from './LoginForm';
 
 const TaskList: React.FC = () => {
@@ -68,6 +69,7 @@ const TaskList: React.FC = () => {
       description: '',
       completed: false,
       createdAt: new Date().toISOString(),
+      tags: []
     };
     
     setTasks(prevTasks => [newTask, ...prevTasks]);
@@ -111,6 +113,23 @@ const TaskList: React.FC = () => {
     });
   }, []);
 
+  // Update task tags
+  const handleUpdateTags = useCallback((id: string, tags: string[]) => {
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === id ? { ...task, tags } : task
+      )
+    );
+    
+    // Also update in storage directly to ensure it's saved
+    updateTaskTags(id, tags);
+    
+    toast({
+      title: "Tags updated",
+      description: "The task tags have been updated.",
+    });
+  }, []);
+
   // Get today's day name
   const getTodayDayName = (): ScheduleItem["day"] => {
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -132,6 +151,7 @@ const TaskList: React.FC = () => {
       description: item.description,
       completed: item.completed,
       createdAt: new Date().toISOString(),
+      tags: [item.day] // Add day as a tag
     }));
     
     // Add tasks if they don't exist yet
@@ -166,6 +186,7 @@ const TaskList: React.FC = () => {
       description: item.description,
       completed: item.completed,
       createdAt: new Date().toISOString(),
+      tags: [item.day]
     }));
     
     // Remove existing schedule tasks and add new ones
@@ -250,6 +271,7 @@ const TaskList: React.FC = () => {
                     onToggle={handleToggleTask}
                     onDelete={handleDeleteTask}
                     onUpdateDescription={handleUpdateDescription}
+                    onUpdateTags={handleUpdateTags}
                   />
                 ))}
               </div>

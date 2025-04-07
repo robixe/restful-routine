@@ -2,26 +2,43 @@
 import React, { useState } from 'react';
 import { Task } from '@/types/Task';
 import { cn } from '@/lib/utils';
-import { CheckCircle, Circle, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle, Circle, Trash2, ChevronDown, ChevronUp, Clock } from 'lucide-react';
+import TaskTags from './TaskTags';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import PomodoroTimer from './PomodoroTimer';
 
 interface TaskItemProps {
   task: Task;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdateDescription?: (id: string, description: string) => void;
+  onUpdateTags?: (id: string, tags: string[]) => void;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onUpdateDescription }) => {
+const TaskItem: React.FC<TaskItemProps> = ({ 
+  task, 
+  onToggle, 
+  onDelete, 
+  onUpdateDescription,
+  onUpdateTags 
+}) => {
   const [isHovering, setIsHovering] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
   const [description, setDescription] = useState(task.description || '');
+  const [showTimer, setShowTimer] = useState(false);
 
   const handleDescriptionSubmit = () => {
     if (onUpdateDescription) {
       onUpdateDescription(task.id, description);
     }
     setEditingDescription(false);
+  };
+
+  const handleUpdateTags = (id: string, tags: string[]) => {
+    if (onUpdateTags) {
+      onUpdateTags(id, tags);
+    }
   };
 
   return (
@@ -59,6 +76,20 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onUpdateD
         </div>
 
         <div className="flex items-center gap-2">
+          <Popover open={showTimer} onOpenChange={setShowTimer}>
+            <PopoverTrigger asChild>
+              <button
+                className="text-muted-foreground hover:text-primary transition-all duration-300 focus:outline-none"
+                aria-label="Start timer for this task"
+              >
+                <Clock className="h-5 w-5" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent side="left" className="w-[350px] p-0">
+              <PomodoroTimer currentTask={task} />
+            </PopoverContent>
+          </Popover>
+          
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="text-muted-foreground hover:text-primary transition-all duration-300 focus:outline-none"
@@ -66,6 +97,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onUpdateD
           >
             {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
           </button>
+          
           <button
             onClick={() => onDelete(task.id)}
             className={cn(
@@ -82,7 +114,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onUpdateD
       </div>
 
       {isExpanded && (
-        <div className="mt-3 pl-9">
+        <div className="mt-3 pl-9 space-y-3">
+          {/* Description section */}
           {editingDescription ? (
             <div className="mt-2">
               <textarea
@@ -120,6 +153,12 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onUpdateD
               )}
             </div>
           )}
+          
+          {/* Tags section */}
+          <div className="mt-3">
+            <h4 className="text-xs font-medium text-muted-foreground mb-1">Tags</h4>
+            <TaskTags task={task} onUpdateTags={handleUpdateTags} />
+          </div>
         </div>
       )}
     </div>

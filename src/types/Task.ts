@@ -5,6 +5,7 @@ export interface Task {
   description?: string;
   completed: boolean;
   createdAt: string;
+  tags?: string[];
 }
 
 export interface ScheduleItem {
@@ -23,4 +24,14 @@ export interface WeeklySchedule {
 export interface User {
   username: string;
   isLoggedIn: boolean;
+}
+
+export interface PomodoroSettings {
+  focusTime: number;
+  breakTime: number;
+  longBreakTime: number;
+  longBreakInterval: number;
+  autoStartBreaks: boolean;
+  autoStartPomodoros: boolean;
+  playSound: boolean;
 }
