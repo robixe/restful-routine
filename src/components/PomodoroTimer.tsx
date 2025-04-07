@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -45,7 +44,6 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ currentTask }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timerRef = useRef<number | null>(null);
   
-  // Initialize audio
   useEffect(() => {
     audioRef.current = new Audio('https://cdn.pixabay.com/download/audio/2022/01/18/audio_291bcd671a.mp3?filename=lofi-study-112191.mp3');
     audioRef.current.loop = true;
@@ -58,12 +56,10 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ currentTask }) => {
     };
   }, []);
   
-  // Save settings to localStorage
   useEffect(() => {
     localStorage.setItem('pomodoro-settings', JSON.stringify(settings));
   }, [settings]);
   
-  // Timer logic
   useEffect(() => {
     if (isActive) {
       timerRef.current = window.setInterval(() => {
@@ -87,7 +83,6 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ currentTask }) => {
     };
   }, [isActive]);
   
-  // Music control based on timer mode
   useEffect(() => {
     if (audioRef.current) {
       if (isMusicPlaying && mode === 'focus') {
@@ -125,7 +120,6 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ currentTask }) => {
         setIsActive(false);
       }
     } else {
-      // Break or long break completed
       setMode('focus');
       setTimeLeft(settings.focusTime * 60);
       

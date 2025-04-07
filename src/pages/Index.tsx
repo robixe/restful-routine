@@ -1,9 +1,16 @@
 
 import React from 'react';
 import TaskList from '@/components/TaskList';
+import PomodoroSection from '@/components/PomodoroSection';
 import { cn } from '@/lib/utils';
+import { loadTasks, loadUser } from '@/lib/storage';
 
 const Index = () => {
+  // Get all tasks and the user state
+  const tasks = loadTasks();
+  const user = loadUser();
+  const isLoggedIn = user?.isLoggedIn;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       <div 
@@ -25,6 +32,8 @@ const Index = () => {
         </header>
         
         <main>
+          {isLoggedIn && <PomodoroSection tasks={tasks} />}
+          
           <div className="bg-white/60 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden">
             <TaskList />
           </div>
