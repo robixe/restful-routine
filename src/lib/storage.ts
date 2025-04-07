@@ -1,3 +1,4 @@
+
 import { Task, WeeklySchedule, ScheduleItem, User } from "@/types/Task";
 
 const TASKS_STORAGE_KEY = 'planning-tasks';
@@ -65,6 +66,22 @@ export const saveUser = (user: User): void => {
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
   } catch (error) {
     console.error('Failed to save user to localStorage:', error);
+  }
+};
+
+export const updateLunchTime = (newTimeSlot: string): void => {
+  try {
+    const schedule = loadWeeklySchedule();
+    const updatedItems = schedule.items.map(item => {
+      if (item.activity === "Lunch & Break") {
+        return { ...item, timeSlot: newTimeSlot };
+      }
+      return item;
+    });
+    
+    saveWeeklySchedule({ items: updatedItems });
+  } catch (error) {
+    console.error('Failed to update lunch time:', error);
   }
 };
 
@@ -151,5 +168,13 @@ const getDefaultWeeklySchedule = (): WeeklySchedule => {
     }
   ];
   
-  return { items: defaultItems };
+  // Update lunch time to 2:00 - 3:00 for weekdays
+  const updatedItems = defaultItems.map(item => {
+    if (item.activity === "Lunch & Break") {
+      return { ...item, timeSlot: "14:00 - 15:00" };
+    }
+    return item;
+  });
+  
+  return { items: updatedItems };
 };

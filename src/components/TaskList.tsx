@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Task, ScheduleItem, User } from '@/types/Task';
 import { loadTasks, saveTasks, loadWeeklySchedule, loadUser, saveUser } from '@/lib/storage';
@@ -11,7 +10,7 @@ import WeeklySchedule from './WeeklySchedule';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Calendar, LogOut } from 'lucide-react';
+import { Calendar, LogOut, Clock } from 'lucide-react';
 import LoginForm from './LoginForm';
 
 const TaskList: React.FC = () => {
@@ -121,6 +120,7 @@ const TaskList: React.FC = () => {
 
   // Add today's schedule items to tasks
   const addTodayScheduleToTasks = useCallback(() => {
+    // Always reload from storage to get the latest schedule (including any edits)
     const weeklySchedule = loadWeeklySchedule();
     const today = getTodayDayName();
     const todayItems = weeklySchedule.items.filter(item => item.day === today);
@@ -151,6 +151,31 @@ const TaskList: React.FC = () => {
         description: "Today's schedule items are already in your tasks list.",
       });
     }
+  }, [tasks]);
+
+  // Force update tasks from schedule (including lunch time changes)
+  const refreshTasksFromSchedule = useCallback(() => {
+    const weeklySchedule = loadWeeklySchedule();
+    const today = getTodayDayName();
+    const todayItems = weeklySchedule.items.filter(item => item.day === today);
+    
+    // Create tasks from schedule items
+    const scheduleTasks = todayItems.map(item => ({
+      id: `schedule-${item.id}-${Date.now()}`,
+      title: `${item.timeSlot} - ${item.activity}`,
+      description: item.description,
+      completed: item.completed,
+      createdAt: new Date().toISOString(),
+    }));
+    
+    // Remove existing schedule tasks and add new ones
+    const nonScheduleTasks = tasks.filter(task => !task.id.startsWith('schedule-'));
+    setTasks([...scheduleTasks, ...nonScheduleTasks]);
+    
+    toast({
+      title: "Tasks updated",
+      description: "Your task list has been updated with the latest schedule.",
+    });
   }, [tasks]);
 
   // Load weekly schedule
@@ -184,15 +209,26 @@ const TaskList: React.FC = () => {
         <TabsContent value="tasks" className="mt-0">
           <div className="flex items-center justify-between mb-4">
             <TaskInput onAddTask={handleAddTask} />
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="ml-2 whitespace-nowrap"
-              onClick={addTodayScheduleToTasks}
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              Add Today's Schedule
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="whitespace-nowrap"
+                onClick={addTodayScheduleToTasks}
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Add Today's Schedule
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="whitespace-nowrap"
+                onClick={refreshTasksFromSchedule}
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                Refresh Schedule
+              </Button>
+            </div>
           </div>
           
           {tasks.length > 0 && <TaskStats tasks={tasks} />}
